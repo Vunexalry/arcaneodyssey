@@ -172,7 +172,7 @@ DecryptString(encrypted, key) {
 }
 
 ; BACKUP FUNCTIONS REMOVED FOR OPEN SOURCE
-; These functions stored encrypted trial time and script modification time in  files (.txt files)
+; These functions stored encrypted trial time and script time in files
 ; to persist state across script modifications and prevent trial reset bypass
 ; Functionality:
 ;   - ExtractBackupFromFile: Read encrypted data from pipe-delimited files
@@ -1387,3 +1387,4 @@ EnsureEnglishOCR() {
 ;@Ahk2Exe-AddResource Lib\64bit\WebView2Loader.dll, 64bit\WebView2Loader.dll
 
 ;///////////////////////////////////////////////////////////////////////////////////////////
+
