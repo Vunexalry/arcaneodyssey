@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FISHING MACRO V2.0</title>
+    <title>FISHING MACRO V2.1</title>
     <style>
         :root {
             --bg-primary: #0a0520;
@@ -433,12 +433,11 @@
     <div class="main-content">
         <div class="container"></div>
 
-        <p>FISHING MACRO V2.0</p>
-        <p>Press F4 to exit</p>
+        <p>FISHING MACRO V2.1</p>
 
         <div class="button-row">
-            <button class="input" id="startMacro">Start Macro (F6)</button>
-            <button class="input" id="reloadMacro">Reload Macro (F7)</button>
+            <button class="input" id="startMacro">Start Macro</button>
+            <button class="input" id="reloadMacro">Reload Macro</button>
         </div>
 
         <div class="input-group">
@@ -507,6 +506,63 @@
 
         <div class="separator"></div>
 
+        <div class="button-row button-row-center">
+            <button class="input button-single" id="keybindsToggle">Keybinds</button>
+        </div>
+
+        <div id="keybindsSection" style="display: none;">
+            <div class="input-group">
+                <label for="cameraAdjustKey">Camera Adjust Key:</label>
+                <input type="text" id="cameraAdjustKey" class="input" placeholder="e.g., F1 or Shift+1">
+            </div>
+            <div class="input-group">
+                <label for="startMacroKey">Start Macro Key:</label>
+                <input type="text" id="startMacroKey" class="input" placeholder="e.g., F6 or Ctrl+F6">
+            </div>
+            <div class="input-group">
+                <label for="reloadMacroKey">Reload Macro Key:</label>
+                <input type="text" id="reloadMacroKey" class="input" placeholder="e.g., F7 or Alt+F7">
+            </div>
+            <div class="input-group">
+                <label for="screenshotKey">Screenshot Key:</label>
+                <input type="text" id="screenshotKey" class="input" placeholder="e.g., F2 or Shift+F2">
+            </div>
+
+            <div class="input-group" style="text-align: left; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="color: #ffffff; font-size: 16px; margin-bottom: 8px;">How to Set Up Keybinds</h3>
+                <p style="color: #ffffff; font-size: 14px; margin-bottom: 8px;">
+                    Enter key combinations in the text fields below. Use the format: <strong>Modifier + Key</strong> (e.g., "Shift+A"). Modifiers are optional for single keys.
+                </p>
+                <ul style="color: #ffffff; font-size: 13px; padding-left: 20px; margin-bottom: 8px;">
+                    <li><strong>Supported Modifiers</strong> (case-insensitive): Shift, Ctrl/Control, Alt, Win.</li>
+                    <li><strong>Keys</strong>: Letters (A-Z), numbers (0-9), F-keys (F1-F12), or special keys like Space, Tab, Enter.</li>
+                    <li><strong>Examples</strong>:
+                        <ul style="padding-left: 20px;">
+                            <li>"F1" → Press F1 alone.</li>
+                            <li>"Shift+A" or "shift+a" → Press Shift + A.</li>
+                            <li>"Ctrl+F6" → Press Ctrl + F6.</li>
+                            <li>"Alt+1" → Press Alt + 1.</li>
+                            <li>"Win+Space" → Press Windows key + Space.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p style="color: #ffffff; font-size: 13px; margin-bottom: 8px;">
+                    <strong>Tips</strong>:
+                    <ul style="padding-left: 20px;">
+                        <li>Changes save automatically and take effect immediately.</li>
+                        <li>If a keybind doesn't work, check the Debug.log file for errors (e.g., invalid key).</li>
+                        <li>Avoid conflicting keys (e.g., don't use F1 if it's already bound elsewhere).</li>
+                        <li>Single keys like "A" work, but modifiers make them unique.</li>
+                    </ul>
+                </p>
+                <p style="color: #ff6b6b; font-size: 12px; margin: 0;">
+                    Note: Multi-key sequences (e.g., "A then B") are not supported. Only modifier + single key combos.
+                </p>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+
         <div id="licenseBox" class="license-box">
             <div id="licenseStatus" class="license-status">Status: ...</div>
             <div id="licenseTime" class="license-time">Time remaining: ...</div>
@@ -514,13 +570,13 @@
         </div>
 
         <h1>Created By Vunoxoulia</h1>
-        <p style="text-align:center; margin-top:6px;"><a id="setupGuideLink" href="https://example.com/setup-guide" target="_blank" style="color: #00bfff; text-decoration: underline;">Set up guide</a> | <a id="discordLink" href="https://discord.gg/m6hbdF5H" target="_blank" style="color: #5865F2; text-decoration: none; font-size: 18px;" title="Join our Discord">🔗 Discord</a></p>
+        <p style="text-align:center; margin-top:6px;"><a id="setupGuideLink" href="https://youtu.be/ds3XSLw2fcc" target="_blank" style="color: #00bfff; text-decoration: underline;">Set up guide</a> | <a id="discordLink" href="https://discord.gg/m6hbdF5H" target="_blank" style="color: #5865F2; text-decoration: none; font-size: 18px;" title="Join our Discord">🔗 Discord</a></p>
 
         <div id="trialModal" class="modal">
             <div class="modal-content">
                 <h2>Trial Expired</h2>
                 <p>Your 12-hour trial has expired. Click the link below to download to reset your trial.</p>
-                <p><a href="https://example.com/download/macro.exe" target="_blank" style="color: #FEBF00; text-decoration: underline;">Download Latest Version</a></p>
+                <p><a href="https://direct-link.net/2990379/qXMzB3m7PlrV" target="_blank" style="color: #FEBF00; text-decoration: underline;">Download Latest Version</a></p>
                 <p>After downloading and replacing the file, restart the macro to get a fresh 12-hour trial.</p>
                 <button class="cancel-btn" onclick="closeModal()">Close</button>
             </div>
@@ -587,6 +643,14 @@
                 document.getElementById('secondaryKeySelect').style.display = toggleSecondary ? 'block' : 'none';
                 const label = document.getElementById('keyLabel');
                 label.textContent = toggleSecondary ? 'Fishing Rod Key (0-9): | Lure Key (0-9)' : 'Fishing Rod Key (0-9):';
+                const cameraAdjustKey = await window.chrome.webview.hostObjects.MacroFuncs.getCameraAdjustKey();
+                document.getElementById('cameraAdjustKey').value = cameraAdjustKey;
+                const startMacroKey = await window.chrome.webview.hostObjects.MacroFuncs.getStartMacroKey();
+                document.getElementById('startMacroKey').value = startMacroKey;
+                const reloadMacroKey = await window.chrome.webview.hostObjects.MacroFuncs.getReloadMacroKey();
+                document.getElementById('reloadMacroKey').value = reloadMacroKey;
+                const screenshotKey = await window.chrome.webview.hostObjects.MacroFuncs.getScreenshotKey();
+                document.getElementById('screenshotKey').value = screenshotKey;
 
                 await startTrialTimer();
                 console.log('UI initialized successfully');
@@ -755,6 +819,40 @@
             } else {
                 showToast('Confidence must be between 0 and 100.');
                 e.target.value = 60;
+            }
+        });
+
+        document.getElementById('keybindsToggle').addEventListener('click', (e) => {
+            const section = document.getElementById('keybindsSection');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+            e.target.blur();
+        });
+
+        document.getElementById('cameraAdjustKey').addEventListener('change', (e) => {
+            const key = e.target.value.trim();
+            if (key) {
+                callAHK('updateCameraAdjustKey', key);
+            }
+        });
+
+        document.getElementById('startMacroKey').addEventListener('change', (e) => {
+            const key = e.target.value.trim();
+            if (key) {
+                callAHK('updateStartMacroKey', key);
+            }
+        });
+
+        document.getElementById('reloadMacroKey').addEventListener('change', (e) => {
+            const key = e.target.value.trim();
+            if (key) {
+                callAHK('updateReloadMacroKey', key);
+            }
+        });
+
+        document.getElementById('screenshotKey').addEventListener('change', (e) => {
+            const key = e.target.value.trim();
+            if (key) {
+                callAHK('updateScreenshotKey', key);
             }
         });
 
