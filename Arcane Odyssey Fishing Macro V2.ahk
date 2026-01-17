@@ -21,7 +21,7 @@ GroupAdd("ScriptGroup", "ahk_pid " DllCall("GetCurrentProcessId"))
 
 CheckAndShowDisclaimer()
 
-global SECRET_KEY := "X9!aQ#7Kp@2Z"
+global SECRET_KEY := "Change for the purpose of Open Source"
 global trialtime := 720.05
 global trialEndTime := 0
 
