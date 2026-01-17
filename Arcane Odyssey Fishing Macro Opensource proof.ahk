@@ -21,7 +21,7 @@ GroupAdd("ScriptGroup", "ahk_pid " DllCall("GetCurrentProcessId"))
 
 CheckAndShowDisclaimer()
 
-global SECRET_KEY := "Change for Opensource purposes"
+global SECRET_KEY := "Change for the purpose of Open Source"
 global trialtime := 720.05
 global trialEndTime := 0
 
@@ -62,11 +62,13 @@ try {
     currentModTime := FileGetTime(A_ScriptFullPath)
     storedModTime := RegRead("HKCU\Software\AOVunox", "ScriptModificationTime", "")
     
-    ; Backup extraction removed for open source
+    if (storedModTime == "") {
+        storedModTime := ExtractBackupFromAreaFile(A_ScriptDir "\FishCaughtArea.txt", "modtime")
+    }
     
     if (storedModTime != "" && currentModTime > storedModTime) {
         RegWrite(currentModTime, "REG_SZ", "HKCU\Software\AOVunox", "ScriptModificationTime")
-        ; Backup save removed for open source
+        SaveBackupToAreaFiles(currentModTime, "modtime")
         remainingSeconds := Integer(trialtime * 60)
         SaveAOVunoxTrialRemainingTime(remainingSeconds)
         FileAppend("File modification detected at startup (newer version). Resetting trial to full time (" remainingSeconds " seconds).`n", A_ScriptDir "\Debug.log")
@@ -111,25 +113,45 @@ LoadAOVunoxTrialRemainingTime() {
         currentModTime := FileGetTime(A_ScriptFullPath, "M")
         storedModTime := RegRead("HKCU\Software\AOVunox", "ScriptModificationTime", "")
 
-        ; Backup extraction removed for open source
+        if (storedModTime == "") {
+            storedModTime := ExtractBackupFromAreaFile(A_ScriptDir "\FishCaughtArea.txt", "modtime")
+        }
 
         if (storedModTime != "" && currentModTime > storedModTime) {
             if (A_TickCount - lastModResetTick > MODRESET_COOLDOWN) {
                 lastModResetTick := A_TickCount
                 RegWrite(currentModTime, "REG_SZ", "HKCU\Software\AOVunox", "ScriptModificationTime")
-                ; Backup save removed for open source
+                SaveBackupToAreaFiles(currentModTime, "modtime")
+                val := IniRead(A_ScriptDir "\Settings.ini", "Disclaimer", "accepted", 1)
             } else {
             }
             return trialtime * 60
         } else if (storedModTime == "") {
             RegWrite(currentModTime, "REG_SZ", "HKCU\Software\AOVunox", "ScriptModificationTime")
-            ; Backup save removed for open source
+            SaveBackupToAreaFiles(currentModTime, "modtime")
             return trialtime * 60
         }
         encrypted := RegRead("HKCU\Software\AOVunox", "AOVunoxTrialRemainingTime", "")
         if encrypted == ""
         {
-            ; Backup extraction removed for open source
+            backupTime := ExtractBackupFromAreaFile(A_ScriptDir "\FishCaughtArea.txt", "trialtime")
+            if (backupTime == "") {
+                backupTime := ExtractBackupFromAreaFile(A_ScriptDir "\BaitArea.txt", "trialtime")
+            }
+            
+            if (backupTime != "") {
+                try {
+                    if RegExMatch(backupTime, "^\d+$") {
+                        backupSeconds := Integer(backupTime)
+                        if (backupSeconds > 0) {
+                            encrypted := EncryptString(backupSeconds, SECRET_KEY)
+                            RegWrite(encrypted, "REG_SZ", "HKCU\Software\AOVunox", "AOVunoxTrialRemainingTime")
+                            return backupSeconds
+                        }
+                    }
+                } catch {
+                }
+            }
             return trialtime * 60
         }
         decrypted := DecryptString(encrypted, SECRET_KEY)
@@ -146,7 +168,7 @@ SaveAOVunoxTrialRemainingTime(remainingSeconds) {
     if remainingSeconds >= 0 { 
         encrypted := EncryptString(remainingSeconds, SECRET_KEY) 
         RegWrite(encrypted, "REG_SZ", "HKCU\Software\AOVunox", "AOVunoxTrialRemainingTime")
-        ; Backup save removed for open source
+        SaveBackupToAreaFiles(remainingSeconds, "trialtime")
         FileAppend("Saved remaining trial time: " remainingSeconds " seconds`n", A_ScriptDir "\Debug.log")
         UpdateSettingsHMAC()
     } else {
@@ -171,13 +193,21 @@ DecryptString(encrypted, key) {
     return EncryptString(encrypted, key)
 }
 
-; BACKUP FUNCTIONS REMOVED FOR OPEN SOURCE
-; These functions stored encrypted trial time and script time in files
-; to persist state across script modifications and prevent trial reset bypass
-; Functionality:
-;   - ExtractBackupFromFile: Read encrypted data from pipe-delimited files
-;   - Encrypted and stored trial remaining seconds
-; Removed for open source purposes
+
+ExtractBackupFromAreaFile(filePath, backupType) {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function extracted encrypted trial time data from pipe-delimited 
+    ;backup entries stored in files , decrypting them using 
+    ;the HWID for persistent state recovery across script.
+    return ""
+}
+
+SaveBackupToAreaFiles(backupValue, backupType) {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function encrypted and saved trial time as pipe-delimited backup data in  
+    ;files, ensuring persistent storage to prevent trial reset bypass.
+    return
+}
 
 PadKey(key, blockSize := 64) {
     if (StrLen(key) > blockSize)
@@ -315,21 +345,49 @@ RemovePremium(*) {
     }
 }
 
-; PREMIUM SERIAL GENERATOR REMOVED FOR OPEN SOURCE
-; This function generated device-specific serial numbers from hardware ID hashes
-; Removed for open source purposes
+GetAOVunoxPremiumSerial() {
+    global currentHWID
+    base := HashString(currentHWID)
+    serial := ""
+    Loop 8 {
+        n := Mod(Ord(SubStr(base, A_Index, 1)), 26)
+        serial .= Chr(65 + n)
+    }
+    return serial
+}
 
 GetHWID() {
     return GetDeviceID()
 }
 
-; PREMIUM GENERATOR FUNCTIONS REMOVED FOR OPEN SOURCE
-; These functions handled:
-;   - ValidateOTP: Verified premium access codes and generated HWID-based tokens
-;   - GenerateRandomSerial: Created device-specific serial numbers from hardware hash
-;   - EncryptSerial: Caesar cipher encryption of serial with HWID-based shift
-;   - MakeAOVunoxPremiumToken: Generated HMAC tokens for premium status verification
-; Removed for open source purposes
+ValidateOTP(otp) {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function validated one-time premium access codes (OTP) by hashing 
+    ;the HWID, SECRET_KEY, then activating premium by setting registry 
+    ;tokens and serials if the OTP matched.
+    return false
+}
+
+GenerateRandomSerial() {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function generated device-specific premium serial numbers by hashing 
+    ;the HWID and converting it to an x-character alphabetic string for license verification.
+    return ""
+}
+
+EncryptSerial(serial, hwid) {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function applied encryption to serial numbers using a 
+    ;HWID-derived key, providing a cipher for secure storage.
+    return ""
+}
+
+MakeAOVunoxPremiumToken(hwid) {
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This function created HMAC-based tokens for premium status by hashing 
+    ;the HWID combined with the SECRET_KEY, used for registry-based license checks.
+    return HashString(hwid "|" SECRET_KEY)
+}
 
 CheckAndShowDisclaimer() {
     global disclaimerAccepted, MyDisclaimerGUI
@@ -386,32 +444,10 @@ DeclineDisclaimer(GuiObjParam, InfoParam) {
     ExitApp()
 }
 CheckRegistryIntegrity(stopMacroOnTamper := false) {
-    global currentHWID, isPremium, MacroRunning, trialEndTime, trialtime, lastModResetTick, MODRESET_COOLDOWN
-    
-    try {
-        currentModTime := FileGetTime(A_ScriptFullPath)
-        storedModTime := RegRead("HKCU\Software\AOVunox", "ScriptModificationTime", "")
-        
-        if (storedModTime != "" && currentModTime > storedModTime) {
-            if (A_TickCount - lastModResetTick > MODRESET_COOLDOWN) {
-                lastModResetTick := A_TickCount
-                RegWrite(currentModTime, "REG_SZ", "HKCU\Software\AOVunox", "ScriptModificationTime")
-                ; Backup save removed for open source
-                trialEndTime := A_TickCount + (Integer(trialtime * 60) * 1000)
-                SaveAOVunoxTrialRemainingTime(Integer(trialtime * 60))
-                FileAppend("File modification detected at " A_Now " (newer version). Resetting trial to full time (720 minutes).`n", A_ScriptDir "\Debug.log")
-            }
-        }
-        
-        ; PREMIUM VALIDATION REMOVED FOR OPEN SOURCE
-        ; Previously checked if storedSerial/storedToken matched expected values from GenerateRandomSerial and MakeAOVunoxPremiumToken
-        ; If tampering detected, would revoke premium access
-        ; Removed for open source purposes
-    } catch as e {
-        FileAppend("Error in CheckRegistryIntegrity: " e.Message "`n", A_ScriptDir "\Debug.log")
-        return false
-    }
-    
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This code snippet checked if stored premium serials and tokens matched 
+    ;expected HWID-based values; if tampering was detected, it revoked premium access and 
+    ;stopped the macro.
     return true
 }
 
@@ -500,6 +536,14 @@ WinShow("ahk_id " MyWindow.hWnd)
 
 Sleep(250)
 
+ConvertKeyFormatReverse(key) {
+    key := StrReplace(key, "+", "Shift+")
+    key := StrReplace(key, "^", "Ctrl+")
+    key := StrReplace(key, "!", "Alt+")
+    key := StrReplace(key, "#", "Win+")
+    return key
+}
+
 MyWindow.AddHostObjectToScript("ahk", {gui: MyWindow})
 MyWindow.AddHostObjectToScript("MacroFuncs", {
     start: StartMacro,
@@ -526,7 +570,15 @@ MyWindow.AddHostObjectToScript("MacroFuncs", {
     getToggleSecondary: (*) => toggleSecondary,
     getAOVunoxPremiumSerial: GetAOVunoxPremiumSerial,
     getHWID: GetHWID,
-    validateOTP: ValidateOTP  ; REMOVED FOR OPEN SOURCE - Premium validation function
+    validateOTP: ValidateOTP,
+    updateCameraAdjustKey: UpdateCameraAdjustKey,
+    updateStartMacroKey: UpdateStartMacroKey,
+    updateReloadMacroKey: UpdateReloadMacroKey,
+    updateScreenshotKey: UpdateScreenshotKey,
+    getCameraAdjustKey: (*) => ConvertKeyFormatReverse(cameraAdjustKey),
+    getStartMacroKey: (*) => ConvertKeyFormatReverse(startMacroKey),
+    getReloadMacroKey: (*) => ConvertKeyFormatReverse(reloadMacroKey),
+    getScreenshotKey: (*) => ConvertKeyFormatReverse(screenshotKey)
 })
 
 CoordMode("Mouse", "Screen")
@@ -558,6 +610,11 @@ global clickTimeout := false
 global wait1Timeout := false
 global waitTimeout := false
 global toggleSecondary := false
+
+global cameraAdjustKey := "F1"
+global startMacroKey := "F6"
+global reloadMacroKey := "F7"
+global screenshotKey := "F2"
 
 xpos_fish_caught := IniRead(A_ScriptDir "\Settings.ini", "Positions", "xpos_fish_caught", 0)
 ypos_fish_caught := IniRead(A_ScriptDir "\Settings.ini", "Positions", "ypos_fish_caught", 0)
@@ -593,9 +650,6 @@ if FileExist(A_ScriptDir "\BaitArea.txt") {
     bait_y2 := area[4]
 }
 
-Hotkey("F1", CameraAdjust)
-Hotkey("F6", TryStartMacro)
-Hotkey("F7", RestartMacro)
 Hotkey("F9", TestFishTrigger)
 Hotkey("F4", SaveAndExit)
 
@@ -604,42 +658,31 @@ TryStartMacro()
 }
 
 StartFishingTestingMacroReal() {
-    ; FISHING LOOP FUNCTIONS REMOVED FOR OPEN SOURCE
-    ; These functions implemented the core fishing automation:
-    ;
-    ; StartFishingTestingMacroReal: Setup function that:
-    ;   - Waited for Roblox window (ahk_exe robloxplayerbeta.exe)
-    ;   - Pressed mousewheel down 7 times (zoom camera adjustment)
-    ;   - Sent Tab twice (UI navigation)
-    ;   - Called main FishingTestingMacro()
-    ;
-    ; RestartMacro: Trial time saving before reload
-    ;
-    ; FishingTestingMacro: Main loop that:
-    ;   - Validated fishing area coordinates were set (4 coordinate points per area)
-    ;   - Sent primary key (fishing action hotkey, e.g., 'e')
-    ;   - Waited 1.5 seconds (action cooldown)
-    ;   - Called SelectBait() to pick lure type
-    ;   - Clicked mouse and waited 1.5 seconds
-    ;   - WaitForImageInArea: Searched for FishTrigger.png image in defined area (~2 min timeout)
-    ;   - Triple clicked mouse rapidly (3 sets of 3 clicks) to interact with fish
-    ;   - IsTextInArea: Used OCR to detect 'caught' text (confirming successful catch)
-    ;   - Optional secondary key toggle: Every 5 iterations, sent secondary key (e.g., lure swap)
-    ;   - Looped indefinitely until stopped
-    ;
-    ; Fishing functionalities removed to prevent copying and bypassing the macro entirely
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This setup function waited for the Roblox window, adjusted the camera 
+    ;and initiated the main fishing loop
+    FishingTestingMacro()
 }
 
 RestartMacro(*) {
-    ; FISHING LOOP FUNCTIONS REMOVED FOR OPEN SOURCE
-    ; Previously saved trial time before reloading script
-    ; Fishing functionalities removed to prevent copying and bypassing the macro entirely
+    global trialEndTime, isPremium
+    if !isPremium {
+        remaining := trialEndTime - A_TickCount
+        if remaining > 0
+            SaveAOVunoxTrialRemainingTime(Floor(remaining / 1000))
+        else
+            SaveAOVunoxTrialRemainingTime(0)
+    }
+    reload()
 }
 
-FishingTestingMacro() {
-    ; FISHING LOOP FUNCTIONS REMOVED FOR OPEN SOURCE
-    ; Main fishing automation loop
-    ; Fishing functionalities removed to prevent copying and bypassing the macro entirely
+
+FishingTestingMacro() { 
+    ;Removed for open source to prevent unauthorized premium bypass, tampering, or code 
+    ;duplication. This main loop automated fishing by validating areas, sending keys for 
+    ;actions, selecting bait, waiting for image triggers, performing rapid mouse clicks, 
+    ;detecting "caught" text via OCR, and handling secondary key toggles every 5 casts, 
+    ;looping indefinitely until stopped or expired.
 }
 
 SelectBait(baitType) {
@@ -672,7 +715,7 @@ SelectBait(baitType) {
         foundNormal := ""
         Loop 3 {
             try {
-                result := OCR.FromRect(x1, y1, x2 - x1, y2 - y1, {scale: 3, grayscale: 1})
+                result := OCR.FromRect(x1, y1, x2 - x1, y2 - y1, {scale: 2.5, grayscale: 1})
                 foundNormal := result.FindString("normal")
                 if foundNormal
                     break
@@ -694,7 +737,7 @@ SelectBait(baitType) {
     found := ""
     Loop 3 {
         try {
-            result := OCR.FromRect(x1, y1, x2 - x1, y2 - y1, {scale: 3, grayscale: 1})
+            result := OCR.FromRect(x1, y1, x2 - x1, y2 - y1, {scale: 2.5, grayscale: 1})
             found := result.FindString(baitText)
             if found
                 break
@@ -835,7 +878,7 @@ IsTextInArea(text, x1, y1, x2, y2) {
     }
     Loop 3 {
         try {
-            result := OCR.FromRect(x1, y1, w, h, {scale: 3, grayscale: 1})
+            result := OCR.FromRect(x1, y1, w, h, {scale: 2.5, grayscale: 1})
             found := result.FindString(text)
             if IsSet(found) {
                 return true
@@ -1225,7 +1268,7 @@ local Confidence := Round((100 - confidence) * 255 / 100)
 }
 
 LoadAllSettings() {
-    global current_method, current_key, current_secondary_key, fish_trigger_confidence, fish_caught_confidence, xpos_fish_caught, ypos_fish_caught, xpos_fish_trigger, ypos_fish_trigger, fish_caught_x1, fish_caught_y1, fish_caught_x2, fish_caught_y2, fish_trigger_x1, fish_trigger_y1, fish_trigger_x2, fish_trigger_y2, bait_x1, bait_y1, bait_x2, bait_y2, toggleSecondary
+    global current_method, current_key, current_secondary_key, fish_trigger_confidence, fish_caught_confidence, xpos_fish_caught, ypos_fish_caught, xpos_fish_trigger, ypos_fish_trigger, fish_caught_x1, fish_caught_y1, fish_caught_x2, fish_caught_y2, fish_trigger_x1, fish_trigger_y1, fish_trigger_x2, fish_trigger_y2, bait_x1, bait_y1, bait_x2, bait_y2, toggleSecondary, cameraAdjustKey, startMacroKey, reloadMacroKey, screenshotKey
     current_method := IniRead(A_ScriptDir "\Settings.ini", "Settings", "current_method", "normal")
     current_key := IniRead(A_ScriptDir "\Settings.ini", "Settings", "current_key", "0")
     current_secondary_key := IniRead(A_ScriptDir "\Settings.ini", "Settings", "current_secondary_key", "0")
@@ -1236,6 +1279,10 @@ LoadAllSettings() {
     ypos_fish_caught := IniRead(A_ScriptDir "\Settings.ini", "Positions", "ypos_fish_caught", 0)
     xpos_fish_trigger := IniRead(A_ScriptDir "\Settings.ini", "Positions", "xpos_fish_trigger", 0)
     ypos_fish_trigger := IniRead(A_ScriptDir "\Settings.ini", "Positions", "ypos_fish_trigger", 0)
+    cameraAdjustKey := IniRead(A_ScriptDir "\Settings.ini", "Keybinds", "cameraAdjustKey", "F1")
+    startMacroKey := IniRead(A_ScriptDir "\Settings.ini", "Keybinds", "startMacroKey", "F6")
+    reloadMacroKey := IniRead(A_ScriptDir "\Settings.ini", "Keybinds", "reloadMacroKey", "F7")
+    screenshotKey := IniRead(A_ScriptDir "\Settings.ini", "Keybinds", "screenshotKey", "F2")
 
     if FileExist(A_ScriptDir "\FishCaughtArea.txt") {
         try {
@@ -1245,7 +1292,6 @@ LoadAllSettings() {
             fish_caught_y1 := area[2]
             fish_caught_x2 := area[3]
             fish_caught_y2 := area[4]
-            ; Note: positions 5 and 6 are backups (modtime and trialtime) - they're ignored during normal load
         } catch {
             FileAppend("Error loading FishCaughtArea.txt`n", A_ScriptDir "\Debug.log")
         }
@@ -1287,6 +1333,32 @@ LoadAllSettings() {
 
         }
     }
+    
+    SetDynamicHotkeys()
+}
+
+SetDynamicHotkeys() {
+    global cameraAdjustKey, startMacroKey, reloadMacroKey, screenshotKey
+    try {
+        Hotkey(cameraAdjustKey, CameraAdjust, "On")
+    } catch {
+        WriteDebug("Error setting camera adjust hotkey: " cameraAdjustKey)
+    }
+    try {
+        Hotkey(startMacroKey, TryStartMacro, "On")
+    } catch {
+        WriteDebug("Error setting start macro hotkey: " startMacroKey)
+    }
+    try {
+        Hotkey(reloadMacroKey, RestartMacro, "On")
+    } catch {
+        WriteDebug("Error setting reload macro hotkey: " reloadMacroKey)
+    }
+    try {
+        Hotkey(screenshotKey, SaveFishTrigger, "On")
+    } catch {
+        WriteDebug("Error setting screenshot hotkey: " screenshotKey)
+    }
 }
 
 UpdateFishTriggerConfidence(confidence) {
@@ -1322,6 +1394,95 @@ UpdateMethod(method) {
     current_method := method
     IniWrite(current_method, A_ScriptDir "\Settings.ini", "Settings", "current_method")
     UpdateSettingsHMAC()
+}
+
+UpdateCameraAdjustKey(newKey) {
+    global cameraAdjustKey
+    newKey := ConvertKeyFormat(Trim(newKey))
+    if (cameraAdjustKey != newKey) {
+        try {
+            Hotkey(cameraAdjustKey, "Off")
+        } catch {
+        }
+        cameraAdjustKey := newKey
+        try {
+            Hotkey(cameraAdjustKey, CameraAdjust, "On")
+        } catch {
+            WriteDebug("Error setting new camera adjust hotkey: " newKey)
+            return
+        }
+    }
+    IniWrite(cameraAdjustKey, A_ScriptDir "\Settings.ini", "Keybinds", "cameraAdjustKey")
+    UpdateSettingsHMAC()
+}
+
+UpdateStartMacroKey(newKey) {
+    global startMacroKey
+    newKey := ConvertKeyFormat(Trim(newKey))
+    if (startMacroKey != newKey) {
+        try {
+            Hotkey(startMacroKey, "Off")
+        } catch {
+        }
+        startMacroKey := newKey
+        try {
+            Hotkey(startMacroKey, TryStartMacro, "On")
+        } catch {
+            WriteDebug("Error setting new start macro hotkey: " newKey)
+            return
+        }
+    }
+    IniWrite(startMacroKey, A_ScriptDir "\Settings.ini", "Keybinds", "startMacroKey")
+    UpdateSettingsHMAC()
+}
+
+UpdateReloadMacroKey(newKey) {
+    global reloadMacroKey
+    newKey := ConvertKeyFormat(Trim(newKey))
+    if (reloadMacroKey != newKey) {
+        try {
+            Hotkey(reloadMacroKey, "Off")
+        } catch { 
+        }
+        reloadMacroKey := newKey
+        try {
+            Hotkey(reloadMacroKey, RestartMacro, "On")
+        } catch {
+            WriteDebug("Error setting new reload macro hotkey: " newKey)
+            return
+        }
+    }
+    IniWrite(reloadMacroKey, A_ScriptDir "\Settings.ini", "Keybinds", "reloadMacroKey")
+    UpdateSettingsHMAC()
+}
+
+UpdateScreenshotKey(newKey) {
+    global screenshotKey
+    newKey := ConvertKeyFormat(Trim(newKey))
+    if (screenshotKey != newKey) {
+        try {
+            Hotkey(screenshotKey, "Off")
+        } catch {
+        }
+        screenshotKey := newKey
+        try {
+            Hotkey(screenshotKey, SaveFishTrigger, "On")
+        } catch {
+            WriteDebug("Error setting new screenshot hotkey: " newKey)
+            return
+        }
+    }
+    IniWrite(screenshotKey, A_ScriptDir "\Settings.ini", "Keybinds", "screenshotKey")
+    UpdateSettingsHMAC()
+}
+
+ConvertKeyFormat(key) {
+    key := StrReplace(key, "Shift+", "+")
+    key := StrReplace(key, "Ctrl+", "^")
+    key := StrReplace(key, "Control+", "^")
+    key := StrReplace(key, "Alt+", "!")
+    key := StrReplace(key, "Win+", "#")
+    return key
 }
 
 GetCurrentMethod() {
@@ -1385,6 +1546,4 @@ EnsureEnglishOCR() {
 ;///////////////////////////////////////////////////////////////////////////////////////////
 ;@Ahk2Exe-AddResource Lib\32bit\WebView2Loader.dll, 32bit\WebView2Loader.dll
 ;@Ahk2Exe-AddResource Lib\64bit\WebView2Loader.dll, 64bit\WebView2Loader.dll
-
 ;///////////////////////////////////////////////////////////////////////////////////////////
-
