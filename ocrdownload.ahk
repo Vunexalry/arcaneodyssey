@@ -11,30 +11,27 @@ if !A_IsAdmin {
     }
 }
 
-; Check available OCR languages
 availableLangs := OCR.GetAvailableLanguages()
 
-; Check if English is available
-if InStr(availableLangs, "en") {
+; Check if English (en-US) is available
+if InStr(availableLangs, "en-US") {
     ; Try to load English OCR
-    OCR.LoadLanguage("en")
+    OCR.LoadLanguage("en-US")
     MsgBox("English OCR language pack is ready!", "Success")
 } else {
-    ; Ask for permission to download
     result := MsgBox("English OCR language pack is not installed.`n`nWould you like to download and install it automatically?`n`nThis will require administrator privileges.", "OCR Language Pack Missing", "YesNo")
     
     if (result = "Yes") {
-        ; Run PowerShell to download English language pack
-        RunWait(A_ComSpec ' /c powershell -Command "Add-WindowsCapability -Online -Name Language.Basic~~~en-US~0.0.1.0 | Out-Null; Add-WindowsCapability -Online -Name Language.OCR~~~en-US~0.0.1.0"', , "Hide")
+        ; Run PowerShell to download English language pack (window will now be visible)
+        RunWait(A_ComSpec ' /c powershell -Command "Add-WindowsCapability -Online -Name Language.Basic~~~en-US~0.0.1.0 | Out-Null; Add-WindowsCapability -Online -Name Language.OCR~~~en-US~0.0.1.0"')
         
-        ; Wait a moment and check againh
         Sleep(2000)
         
         ; Refresh available languages
         availableLangs := OCR.GetAvailableLanguages()
         
-        if InStr(availableLangs, "en") {
-            OCR.LoadLanguage("en")
+        if InStr(availableLangs, "en-US") {
+            OCR.LoadLanguage("en-US")
             MsgBox("English OCR language pack installed successfully!", "Success")
         } else {
             MsgBox("Installation started. Please restart your computer and run this script again.", "Installation In Progress")

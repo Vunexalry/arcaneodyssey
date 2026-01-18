@@ -527,6 +527,10 @@
                 <label for="screenshotKey">Screenshot Key:</label>
                 <input type="text" id="screenshotKey" class="input" placeholder="e.g., F2 or Shift+F2">
             </div>
+            <div class="input-group">
+                <label for="exitKey">Exit Key:</label>
+                <input type="text" id="exitKey" class="input" placeholder="e.g., F4 or Ctrl+Q">
+            </div>
 
             <div class="input-group" style="text-align: left; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
                 <h3 style="color: #ffffff; font-size: 16px; margin-bottom: 8px;">How to Set Up Keybinds</h3>
@@ -651,6 +655,8 @@
                 document.getElementById('reloadMacroKey').value = reloadMacroKey;
                 const screenshotKey = await window.chrome.webview.hostObjects.MacroFuncs.getScreenshotKey();
                 document.getElementById('screenshotKey').value = screenshotKey;
+                const exitKey = await window.chrome.webview.hostObjects.MacroFuncs.getExitKey();
+                document.getElementById('exitKey').value = exitKey;
 
                 await startTrialTimer();
                 console.log('UI initialized successfully');
@@ -853,6 +859,13 @@
             const key = e.target.value.trim();
             if (key) {
                 callAHK('updateScreenshotKey', key);
+            }
+        });
+
+        document.getElementById('exitKey').addEventListener('change', (e) => {
+            const key = e.target.value.trim();
+            if (key) {
+                callAHK('updateExitKey', key);
             }
         });
 
